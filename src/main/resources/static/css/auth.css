@@ -1,0 +1,311 @@
+/* Основные стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+/* Контейнер формы */
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-form-wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 25px 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок формы */
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.form-header h1 {
+    color: #2c3e50;
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Форма */
+.auth-form {
+    margin-bottom: 15px;
+}
+
+/* Группа полей */
+.form-group {
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+/* Поля ввода */
+.form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.form-group input.error {
+    border-color: #ef4444;
+}
+
+/* Стили для полей пароля - убираем стандартный глазок браузера */
+input[type="password"] {
+    /* Отключаем автозаполнение и стандартные иконки в Edge/Chrome */
+    -webkit-text-security: disc !important;
+    /* Для Firefox */
+    -moz-text-security: disc !important;
+    /* Убираем стандартные иконки "показать пароль" */
+    &::-ms-reveal,
+    &::-ms-clear {
+        display: none !important;
+    }
+
+    /* Для Chrome/Edge/Safari */
+    &::-webkit-credentials-auto-fill-button,
+    &::-webkit-credentials-auto-fill-button:hover,
+    &::-webkit-credentials-auto-fill-button:active {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        right: -9999px !important;
+    }
+}
+
+/* Контейнер пароля */
+.password-wrapper {
+    position: relative;
+}
+
+/* Кнопка показа пароля */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    /* Убираем все стандартные стили браузера */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 0;
+    margin: 0;
+    outline: none;
+    box-shadow: none;
+}
+
+.toggle-password:hover {
+    color: #4f46e5;
+}
+
+/* Ошибка валидации с подробным описанием */
+.form-group .error-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: #c00;
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 100;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.form-group input.error:hover ~ .error-tooltip,
+.error-tooltip:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Специальные стили для ошибок пароля */
+.form-group input[type="password"].error + .error-tooltip {
+    width: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Уведомления с увеличенным временем отображения */
+.alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.5s ease;
+}
+
+.alert.hiding {
+    opacity: 0;
+}
+
+.alert.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* Кнопки */
+.auth-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    position: relative;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+}
+
+.primary-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+}
+
+.primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Спиннер загрузки */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Переключатель между формами */
+.auth-switch {
+    text-align: center;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.auth-switch p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.auth-switch a {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    body {
+        padding: 8px 15px;
+    }
+
+    .auth-form-wrapper {
+        padding: 20px 25px;
+    }
+
+    .form-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .form-group input {
+        padding: 9px 12px;
+        font-size: 0.85rem;
+    }
+
+    .form-group input[type="password"].error + .error-tooltip {
+        width: 100%;
+        left: 0;
+        transform: none;
+    }
+}

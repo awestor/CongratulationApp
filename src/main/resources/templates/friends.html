@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Друзья - Календарь Поздравлений</title>
+    <link rel="stylesheet" th:href="@{/css/friend.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<!-- Шапка -->
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo">
+            <i class="fas fa-users"></i>
+            <h1>Друзья</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="/" class="nav-link">
+                <i class="fas fa-home"></i> Главная
+            </a>
+            <a href="/friends" class="nav-link active">
+                <i class="fas fa-users"></i> Друзья
+            </a>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </form>
+        </nav>
+    </div>
+</header>
+
+<main class="main-container">
+    <!-- Заголовок страницы с кнопкой добавления -->
+    <div class="page-header">
+        <h1 class="page-title">Список друзей</h1>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i>
+            Добавить друга
+        </button>
+    </div>
+
+    <!-- Поиск и управление -->
+    <div class="controls-section">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск по имени или email...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="pagination-info" id="paginationInfo">
+            Показано <span id="shownCount">0</span> из <span id="totalCount">0</span> друзей
+        </div>
+    </div>
+
+    <!-- Таблица друзей -->
+    <div class="table-container">
+        <table class="friends-table">
+            <thead>
+            <tr>
+                <th data-sort="name" class="sortable">
+                    <span class="th-content">Имя</span>
+                </th>
+                <th data-sort="email" class="sortable">
+                    <span class="th-content">Email</span>
+                </th>
+                <th data-sort="birthDate" class="sortable">
+                    <span class="th-content">Дата рождения</span>
+                </th>
+                <th data-sort="age" class="sortable">
+                    <span class="th-content">Возраст</span>
+                </th>
+                <th class="actions-header">
+                    <span class="th-content">Действия</span>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="friendsTableBody">
+            <!-- Динамически заполняется JavaScript -->
+            <tr class="loading-row">
+                <td colspan="5">
+                    <div class="loading-spinner"></div>
+                    <span>Загрузка данных...</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Пагинация -->
+    <div class="pagination-container" id="paginationContainer" style="display: none;">
+        <div class="pagination">
+            <button class="pagination-btn" id="prevPage" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="pagination-pages" id="paginationPages">
+                <!-- Страницы будут генерироваться динамически -->
+            </div>
+
+            <button class="pagination-btn" id="nextPage">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="page-size-selector">
+            <label for="pageSizeSelect">Показывать по:</label>
+            <select id="pageSizeSelect" class="page-size-select">
+                <option value="8">8</option>
+                <option value="12" selected>12</option>
+                <option value="24">24</option>
+                <option value="48">48</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Состояние при пустом списке -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <h3 class="empty-state-title">Друзья не найдены</h3>
+        <p class="empty-state-description">Друзья ещё не добавлены в систему.</p>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i>
+            Добавить первого друга
+        </button>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stats-section">
+        <div class="stats-card">
+            <h3 class="stats-title">Статистика друзей</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Всего друзей</span>
+                    <span class="stat-value" id="totalFriendsCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ближайшие ДР (7 дней)</span>
+                    <span class="stat-value" id="upcomingBirthdaysCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">ДР сегодня</span>
+                    <span class="stat-value" id="todayBirthdaysCount">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Модальное окно для создания/редактирования друга -->
+<div id="friendModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Добавить друга</h3>
+            <button type="button" class="btn-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="friendForm" enctype="multipart/form-data">
+                <input type="hidden" id="friendId" name="id">
+
+                <div class="form-group">
+                    <label for="fio" class="form-label">ФИО *</label>
+                    <input type="text" id="fio" name="FIO" class="form-input" required
+                           placeholder="Введите полное имя">
+                    <div class="form-hint">Минимум 4 символа, только буквы</div>
+                    <div class="form-error" id="fioError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input"
+                           placeholder="example@mail.com">
+                    <div class="form-error" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateOfBirth" class="form-label">Дата рождения *</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-input" required>
+                    <div class="form-error" id="dateOfBirthError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea id="description" name="description" class="form-input" rows="3"
+                              placeholder="Дополнительная информация о друге..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image" class="form-label">Фотография</label>
+                    <div class="file-upload">
+                        <input type="file" id="image" name="image" class="file-input" accept="image/*">
+                        <label for="image" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Выберите файл</span>
+                        </label>
+                        <div class="file-info" id="fileInfo">Файл не выбран</div>
+                    </div>
+                    <div class="form-hint">Максимальный размер: 10MB. Поддерживаемые форматы: JPG, PNG, GIF</div>
+                    <div class="form-error" id="imageError"></div>
+
+                    <!-- Предпросмотр изображения -->
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Предпросмотр">
+                        <button type="button" class="remove-image-btn" onclick="removeImage()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Текущее изображение (при редактировании) -->
+                    <div class="current-image" id="currentImage" style="display: none;">
+                        <div class="current-image-label">Текущее изображение:</div>
+                        <img id="currentImageSrc" src="" alt="Текущее изображение">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h3 class="modal-title">Подтверждение удаления</h3>
+            <button type="button" class="btn-close" onclick="closeDeleteModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="delete-confirm">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Вы уверены, что хотите удалить этого друга?</p>
+                <p class="delete-warning">Это действие нельзя отменить.</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/friends.js}"></script>
+</body>
+</html>

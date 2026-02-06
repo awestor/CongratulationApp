@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-form-wrapper">
+        <div class="form-header">
+            <h1><i class="fas fa-sign-in-alt"></i> Вход</h1>
+        </div>
+
+        <!-- Динамическое уведомление о валидации -->
+        <div id="loginAlert" class="alert" style="display: none;"></div>
+
+        <!-- Стандартная форма Spring Security -->
+        <form id="loginForm" class="auth-form" th:action="@{/login}" method="post">
+            <!-- Сообщения об ошибках Spring Security -->
+            <div th:if="${param.error}" class="alert error" style="display: flex;">
+                Неверный email или пароль
+            </div>
+            <div th:if="${param.logout}" class="alert success" style="display: flex;">
+                Вы успешно вышли из системы
+            </div>
+
+            <!-- CSRF токен для Spring Security -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-envelope"></i> Email
+                </label>
+                <input type="email" id="username" name="username" placeholder="Email" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-key"></i> Пароль
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Пароль" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn primary-btn" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Войти
+            </button>
+
+            <div class="auth-switch">
+                <p>Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>
